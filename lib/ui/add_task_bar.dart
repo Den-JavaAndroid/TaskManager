@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,7 +13,9 @@ class AddTaskPage extends StatefulWidget {
 }
 
 class _AddTaskPageState extends State<AddTaskPage> {
-  DateTime? _selectedDate = DateTime.now();
+  DateTime _selectedDate = DateTime.now();
+  String _endTime = "9:30 PM";
+  String _startTime = DateFormat("hh:mm a").format(DateTime.now()).toString();
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +47,37 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   },
                 ),
               ),
+              Row(
+                children: [
+                  Expanded(
+                      child: MyInputField(
+                    title: "Start Time",
+                    hint: _startTime,
+                    widget: IconButton(
+                      onPressed: () {
+                        _getTimeFromUser(isStartTime: true);
+                      },
+                      icon: Icon(Icons.access_time_rounded),
+                      color: Colors.grey,
+                    ),
+                  )),
+                  SizedBox(
+                    width: 12,
+                  ),
+                  Expanded(
+                      child: MyInputField(
+                    title: "End Time",
+                    hint: _endTime,
+                    widget: IconButton(
+                      onPressed: () {
+                        _getTimeFromUser(isStartTime: false);
+                      },
+                      icon: const Icon(Icons.access_time_rounded),
+                      color: Colors.grey,
+                    ),
+                  )),
+                ],
+              )
             ],
           ),
         ),
@@ -88,5 +120,30 @@ class _AddTaskPageState extends State<AddTaskPage> {
     } else {
       print("It's null or something wrong");
     }
+  }
+
+  _getTimeFromUser({required bool isStartTime}) async {
+    var pickedTime = await _showTimePicker();
+    String _formattedTime = pickedTime.format(context);
+    if (pickedTime == null) {
+      print("Time canceled");
+    } else if (isStartTime == true) {
+      setState(() {
+        _startTime = _formattedTime;
+      });
+    } else if (isStartTime == false) {
+      setState(() {
+        _endTime = _formattedTime;
+      });
+    }
+  }
+
+  _showTimePicker() {
+    return showTimePicker(
+        context: context,
+        initialEntryMode: TimePickerEntryMode.dial,
+        initialTime: TimeOfDay(
+            hour: int.parse(_startTime.split(":")[0]),
+            minute: int.parse(_startTime.split(":")[1].split(" ")[0])));
   }
 }
