@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:task_manager/ui/Themes.dart';
+import 'package:task_manager/ui/widgets/button.dart';
 import 'package:task_manager/ui/widgets/input_field.dart';
 
 class AddTaskPage extends StatefulWidget {
@@ -19,6 +20,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   List<int> remindList = [5, 10, 15, 20, 30];
   String _selectedRepeat = "None";
   List<String> repeatList = ["None", "Daily", "Weekly", "Monthly"];
+  int _selectedColor = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +126,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Text(value, style: const TextStyle(color: Colors.grey)),
+                        child: Text(value,
+                            style: const TextStyle(color: Colors.grey)),
                       );
                     }).toList(),
                     underline: Container(
@@ -137,10 +140,61 @@ class _AddTaskPageState extends State<AddTaskPage> {
                     },
                   ),
                 ),
+                const SizedBox(
+                  height: 18,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _colorPallete(),
+                    MyButton(label: "Create Task", onTap: ()=>null)
+                  ],
+                )
               ],
             ),
           ),
         ));
+  }
+
+  _colorPallete() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Color", style: titleStyle),
+        const SizedBox(
+          height: 8.0,
+        ),
+        Wrap(
+          children: List<Widget>.generate(3, (int index) {
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedColor = index;
+                });
+              },
+              child: Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: CircleAvatar(
+                    radius: 14,
+                    backgroundColor: index == 0
+                        ? primaryClr
+                        : index == 1
+                            ? pinkClr
+                            : yellowClr,
+                    child: _selectedColor == index
+                        ? Icon(
+                            Icons.done,
+                            color: Colors.white,
+                            size: 16,
+                          )
+                        : Container(),
+                  )),
+            );
+          }),
+        )
+      ],
+    );
   }
 
   _appBar(BuildContext context) {
