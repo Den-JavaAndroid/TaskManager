@@ -1,6 +1,7 @@
 import 'package:date_picker_timeline/date_picker_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +11,7 @@ import 'package:task_manager/services/theme_services.dart';
 import 'package:task_manager/ui/Themes.dart';
 import 'package:task_manager/ui/add_task_bar.dart';
 import 'package:task_manager/ui/widgets/button.dart';
+import 'package:task_manager/ui/widgets/task_tile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -40,7 +42,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           _addTaskBar(),
           _addDateBar(),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           _showTasks()
@@ -142,14 +144,26 @@ class _HomePageState extends State<HomePage> {
       return ListView.builder(
           itemCount: _taskController.taskList.length,
           itemBuilder: (_, index) {
-            return Container(
-              width: 100,
-              height: 50,
-              color: Colors.green,
-              margin: const EdgeInsets.only(bottom: 10),
-              child: Text(_taskController.taskList[index].title),
+            return AnimationConfiguration.staggeredList(
+                position: index,
+                child: SlideAnimation(
+                  child: FadeInAnimation(
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: (){_showBottomSheet(context, task);},
+                          child: TaskTile(_taskController.taskList[index]),
+                        )
+                      ],
+                    ),
+                  ),
+                )
             );
           });
     }));
+  }
+
+  void _showBottomSheet(BuildContext context, task) {
+
   }
 }
