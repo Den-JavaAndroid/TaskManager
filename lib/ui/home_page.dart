@@ -151,19 +151,108 @@ class _HomePageState extends State<HomePage> {
                     child: Row(
                       children: [
                         GestureDetector(
-                          onTap: (){_showBottomSheet(context, task);},
+                          onTap: () {
+                            _showBottomSheet(
+                                context, _taskController.taskList[index]);
+                          },
                           child: TaskTile(_taskController.taskList[index]),
                         )
                       ],
                     ),
                   ),
-                )
-            );
+                ));
           });
     }));
   }
 
   void _showBottomSheet(BuildContext context, task) {
+    Get.bottomSheet(Container(
+      color: Get.isDarkMode ? darkGreyClr : Colors.white,
+      padding: const EdgeInsets.only(top: 4),
+      height: task.isCompleted == 1
+          ? MediaQuery.of(context).size.height * 0.24
+          : MediaQuery.of(context).size.height * 0.32,
+      child: Column(
+        children: [
+          Container(
+            height: 6,
+            width: 120,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Get.isDarkMode ? Colors.grey[600] : Colors.grey[300]),
+          ),
+          Spacer(),
+          task.isCompleted == 1
+              ? Container()
+              : _bottomSheetButton(
+                  label: "Task Completed",
+                  onTap: () {
+                    Get.back();
+                  },
+                  color: primaryClr,
+                  context: context),
+          const SizedBox(
+            height: 12,
+          ),
+          _bottomSheetButton(
+              label: "Delete Task",
+              onTap: () {
+                _taskController.delete(task);
+                _taskController.getTasks();
+                Get.back();
+              },
+              color: Colors.red[300]!,
+              context: context),
+          const SizedBox(
+            height: 20,
+          ),
+          _bottomSheetButton(
+              label: "Close",
+              onTap: () {
+                Get.back();
+              },
+              color: Colors.red[300]!,
+              context: context,
+              isClose: true),
+          const SizedBox(
+            height: 10,
+          ),
+        ],
+      ),
+    ));
+  }
 
+  _bottomSheetButton(
+      {required String label,
+      required Function() onTap,
+      required Color color,
+      bool isClose = false,
+      required BuildContext context}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        height: 55,
+        width: MediaQuery.of(context).size.width * 0.9,
+        decoration: BoxDecoration(
+          border: Border.all(
+            width: 2,
+            color: isClose == true
+                ? Get.isDarkMode
+                    ? Colors.grey[600]!
+                    : Colors.grey[300]!
+                : color,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          color: isClose == true ? Colors.transparent : color,
+        ),
+        child: Center(
+            child: Text(
+          label,
+          style:
+              isClose ? titleStyle : titleStyle.copyWith(color: Colors.white),
+        )),
+      ),
+    );
   }
 }
