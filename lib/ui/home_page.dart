@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:task_manager/controllers/task_controller.dart';
 import 'package:task_manager/services/notificaton_services.dart';
 import 'package:task_manager/services/theme_services.dart';
 import 'package:task_manager/ui/Themes.dart';
@@ -20,6 +21,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   var notifyHelper;
   DateTime _selectedDate = DateTime.now();
+  final _taskController = Get.put(TaskController());
 
   @override
   void initState() {
@@ -33,11 +35,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBar(),
-      backgroundColor: context.theme.backgroundColor ,
+      backgroundColor: context.theme.backgroundColor,
       body: Column(
         children: [
           _addTaskBar(),
           _addDateBar(),
+          SizedBox(
+            height: 10,
+          ),
+          _showTasks()
         ],
       ),
     );
@@ -90,7 +96,12 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          MyButton(label: "+ Add Task", onTap: () => Get.to(()=>AddTaskPage()))
+          MyButton(
+              label: "+ Add Task",
+              onTap: () async {
+                await Get.to(() => AddTaskPage());
+                _taskController.getTasks();
+              })
         ],
       ),
     );
@@ -124,5 +135,21 @@ class _HomePageState extends State<HomePage> {
         )
       ],
     );
+  }
+
+  _showTasks() {
+    return Expanded(child: Obx(() {
+      return ListView.builder(
+          itemCount: _taskController.taskList.length,
+          itemBuilder: (_, index) {
+            return Container(
+              width: 100,
+              height: 50,
+              color: Colors.green,
+              margin: const EdgeInsets.only(bottom: 10),
+              child: Text(_taskController.taskList[index].title),
+            );
+          });
+    }));
   }
 }

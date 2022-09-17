@@ -1,7 +1,7 @@
 class Task {
   int? id;
-  String? title;
-  String? note;
+  late String title;
+  late String note;
   int? isCompleted;
   String? date;
   String? startTime;
@@ -12,8 +12,8 @@ class Task {
 
   Task(
       {this.id,
-      this.title,
-      this.note,
+       required this.title,
+      required this.note,
       this.isCompleted,
       this.date,
       this.startTime,
