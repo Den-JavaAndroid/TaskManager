@@ -13,6 +13,8 @@ class AddTaskPage extends StatefulWidget {
 }
 
 class _AddTaskPageState extends State<AddTaskPage> {
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
   String _endTime = "9:30 PM";
   String _startTime = DateFormat("hh:mm a").format(DateTime.now()).toString();
@@ -37,8 +39,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   "Add Task",
                   style: headingStyle,
                 ),
-                const MyInputField(title: "Title", hint: "Enter title here"),
-                const MyInputField(title: "Note", hint: "Enter your note here"),
+                 MyInputField(title: "Title", hint: "Enter title here",controller: _titleController,),
+                 MyInputField(title: "Note", hint: "Enter your note here",controller: _noteController,),
                 MyInputField(
                   title: "Date",
                   hint: DateFormat.yMd().format(_selectedDate!),
@@ -148,13 +150,28 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     _colorPallete(),
-                    MyButton(label: "Create Task", onTap: ()=>null)
+                    MyButton(label: "Create Task", onTap: ()=>_validateDate())
                   ],
                 )
               ],
             ),
           ),
         ));
+  }
+
+  _validateDate(){
+    if(_titleController.text.isNotEmpty&&_noteController.text.isNotEmpty){
+      //add to db
+      Get.back();
+    }else{
+      if(_titleController.text.isEmpty || _noteController.text.isEmpty){
+        Get.snackbar("Required", "All fields are required!",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.white,
+        colorText: pinkClr,
+        icon: const Icon(Icons.warning_amber_rounded));
+      }
+    }
   }
 
   _colorPallete() {
