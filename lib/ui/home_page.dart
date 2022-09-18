@@ -13,6 +13,8 @@ import 'package:task_manager/ui/add_task_bar.dart';
 import 'package:task_manager/ui/widgets/button.dart';
 import 'package:task_manager/ui/widgets/task_tile.dart';
 
+import '../models/task.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -21,7 +23,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  var notifyHelper;
+  late NotifyHelper notifyHelper;
   DateTime _selectedDate = DateTime.now();
   final _taskController = Get.put(TaskController());
 
@@ -62,16 +64,17 @@ class _HomePageState extends State<HomePage> {
         selectionColor: primaryClr,
         selectedTextColor: Colors.white,
         dateTextStyle: GoogleFonts.lato(
-            textStyle: TextStyle(
+            textStyle: const TextStyle(
                 fontSize: 20, fontWeight: FontWeight.w600, color: Colors.grey)),
         dayTextStyle: GoogleFonts.lato(
-            textStyle: TextStyle(
+            textStyle: const TextStyle(
                 fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey)),
         monthTextStyle: GoogleFonts.lato(
-            textStyle: TextStyle(
+            textStyle: const TextStyle(
                 fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey)),
         onDateChange: (date) {
           _selectedDate = date;
+          _taskController.getTasks();
         },
       ),
     );
@@ -144,23 +147,36 @@ class _HomePageState extends State<HomePage> {
       return ListView.builder(
           itemCount: _taskController.taskList.length,
           itemBuilder: (_, index) {
-            return AnimationConfiguration.staggeredList(
-                position: index,
-                child: SlideAnimation(
-                  child: FadeInAnimation(
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            _showBottomSheet(
-                                context, _taskController.taskList[index]);
-                          },
-                          child: TaskTile(_taskController.taskList[index]),
-                        )
-                      ],
+            Task task = _taskController.taskList[index];
+            if ((task.repeat == "Daily") ||
+                (task.date == DateFormat.yMd().format(_selectedDate))) {
+              DateTime date = DateFormat.jm().parse(task.startTime.toString());
+              var myTime = DateFormat("HH:mm").format(date);
+              notifyHelper.scheduledNotification(
+                int.parse(myTime.toString().split(":")[0]),
+                int.parse(myTime.toString().split(":")[1]),
+                task
+              );
+
+              return AnimationConfiguration.staggeredList(
+                  position: index,
+                  child: SlideAnimation(
+                    child: FadeInAnimation(
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              _showBottomSheet(context, task);
+                            },
+                            child: TaskTile(task),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                ));
+                  ));
+            } else {
+              return Container();
+            }
           });
     }));
   }

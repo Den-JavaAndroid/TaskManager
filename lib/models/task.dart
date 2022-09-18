@@ -30,7 +30,8 @@ class Task {
     date = json['date'];
     startTime = json['startTime'];
     endTime = json['endTime'];
-    color = json['remind'];
+    color = json['color'];
+    remind = json['remind'];
     repeat = json['repeat'];
   }
 
@@ -44,6 +45,7 @@ class Task {
     data['startTime'] = startTime;
     data['endTime'] = endTime;
     data['remind'] = remind;
+    data['color'] = color;
     data['repeat'] = repeat;
     return data;
   }
