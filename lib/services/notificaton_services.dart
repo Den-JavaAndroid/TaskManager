@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:task_manager/services/theme_services.dart';
+import 'package:task_manager/ui/notified_page.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -20,7 +21,9 @@ class NotifyHelper {
     const iosSetting = IOSInitializationSettings();
     const initSettings =
         InitializationSettings(android: androidSetting, iOS: iosSetting);
-    await _localNotificationsPlugin.initialize(initSettings).then((_) {
+    await _localNotificationsPlugin
+        .initialize(initSettings, onSelectNotification: selectNotification)
+        .then((_) {
       debugPrint('setupPlugin: setup success');
     }).catchError((Object error) {
       debugPrint('Error: $error');
@@ -41,19 +44,14 @@ class NotifyHelper {
       title,
       body,
       platformChannelSpecifics,
-      payload: 'It could be anything you pass',
+      payload: title,
     );
   }
 
   Future selectNotification(String? payload) async {
-    if (payload != null) {
-      print('notification payload: $payload');
-    } else {
-      print("Notification Done");
+    if (payload != "Theme changed") {
+      Get.to(() => NotifiedPage(label: payload!));
     }
-    Get.to(() => Container(
-          color: Colors.white,
-        ));
   }
 
   scheduledNotification(int hour, int minutes, Task task) async {
@@ -68,8 +66,8 @@ class NotifyHelper {
         androidAllowWhileIdle: true,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time
-    );
+        matchDateTimeComponents: DateTimeComponents.time,
+        payload: "${task.title}|${task.note}|");
   }
 
   tz.TZDateTime _convertTime(int hour, int minutes) {
@@ -88,31 +86,3 @@ class NotifyHelper {
     tz.setLocalLocation(tz.getLocation(timeZone));
   }
 }
-
-// Future onDidReceiveLocalNotification(
-//     int id, String? title, String? body, String payload) async {
-//   // display a dialog with the notification details, tap ok to go to another page
-//   showDialog(
-//     //context: context,
-//     builder: (BuildContext context) => CupertinoAlertDialog(
-//       title: Text(title),
-//       content: Text(body),
-//       actions: [
-//         CupertinoDialogAction(
-//           isDefaultAction: true,
-//           child: Text('Ok'),
-//           onPressed: () async {
-//             Navigator.of(context, rootNavigator: true).pop();
-//             await Navigator.push(
-//               context,
-//               MaterialPageRoute(
-//                 builder: (context) => SecondScreen(payload),
-//               ),
-//             );
-//           },
-//         )
-//       ],
-//     ),
-//   );
-//   Get.dialog(const Text("Welcome to flutter"));
-// }
